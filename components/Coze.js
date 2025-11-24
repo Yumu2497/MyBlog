@@ -38,8 +38,66 @@ export default function Coze() {
   // 🚀 修复点 1: 必须先获取 Session ID
   const currentSessionId = getOrCreatePersistentSessionId();
 
+  // 生成唯一的 token 存储键名
+  function getTokenStorageKey() {
+    return `coze_token_${currentSessionId}`;
+  }
+
+  // 生成 12 小时后的过期时间戳
+  function generateExpiryTime() {
+    return Date.now() + 12 * 60 * 60 * 1000; // 12小时 = 12 * 60 * 60 * 1000 毫秒
+  }
+
+  // 从本地存储获取 token（如果未过期）
+  function getStoredToken() {
+    const storageKey = getTokenStorageKey();
+    const storedData = localStorage.getItem(storageKey);
+    
+    if (!storedData) {
+      return null;
+    }
+
+    try {
+      const { token, expiry } = JSON.parse(storedData);
+      
+      // 检查是否过期
+      if (Date.now() > expiry) {
+        // token 已过期，删除它
+        localStorage.removeItem(storageKey);
+        console.log("Coze Token 已过期，已删除");
+        return null;
+      }
+      
+      return token;
+    } catch (error) {
+      console.error("解析存储的 Token 时出错:", error);
+      localStorage.removeItem(storageKey);
+      return null;
+    }
+  }
+
+  // 将 token 存储到本地存储中，并设置 12 小时过期时间
+  function storeToken(token) {
+    const storageKey = getTokenStorageKey();
+    const expiryTime = generateExpiryTime();
+    const dataToStore = {
+      token: token,
+      expiry: expiryTime
+    };
+
+    localStorage.setItem(storageKey, JSON.stringify(dataToStore));
+    console.log("Coze Token 已存储，将在 12 小时后过期");
+  }
+
   // 核心认证函数：使用 fetch 调用您的 Worker
   async function getCozeToken() {
+    // 首先尝试从本地存储获取未过期的 token
+    const storedToken = getStoredToken();
+    if (storedToken) {
+      console.log("使用本地存储的 Coze Token");
+      return storedToken;
+    }
+
     try {
       // currentSessionId 现在是可用的
       const response = await fetch(WORKER_AUTH_URL, {
@@ -62,7 +120,12 @@ export default function Coze() {
       // console.log(data.access_token)
       // console.log("Access Token 获取成功！");
 
-      return data.access_token;
+      const token = data.access_token;
+      
+      // 将新获取的 token 存储到本地，并设置 12 小时过期时间
+      storeToken(token);
+
+      return token;
     } catch (error) {
       console.error("认证流程错误:", error);
       // 返回一个空字符串或抛出错误，以便 SDK 处理失败
