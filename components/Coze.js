@@ -90,7 +90,7 @@ export default function Coze() {
       // 3. 初始化 SDK，并传入 Token
       const cozeClient = new CozeWebSDK.WebChatClient({
         config: {
-          bot_id: botId
+          bot_id: '7555042015739330575'
         },
         componentProps: {
           title: title
