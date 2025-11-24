@@ -84,6 +84,7 @@ export default function Coze() {
     // 2. 加载外部资源
     await loadExternalResource(cozeSrc);
     const CozeWebSDK = window?.CozeWebSDK;
+    console.log(botId)
     
     if (CozeWebSDK && initialToken) {
       // 3. 初始化 SDK，并传入 Token
