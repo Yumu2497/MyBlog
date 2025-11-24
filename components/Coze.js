@@ -12,7 +12,8 @@ export default function Coze() {
     'https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js'
   )
   const title = siteConfig('COZE_TITLE', 'NotionNext助手')
-  const botId = siteConfig('COZE_BOT_ID')
+  const rawBotId = siteConfig('COZE_BOT_ID')
+  const botId = typeof rawBotId === 'string' && rawBotId.startsWith('\\') ? rawBotId.substring(1) : rawBotId
 
   // 您的认证 Worker URL (请替换为您的实际 URL)
   const WORKER_AUTH_URL = 'https://cozejwt.techyumu.us.kg';
@@ -26,9 +27,9 @@ export default function Coze() {
     if (!sessionId) {
       sessionId = crypto.randomUUID();
       localStorage.setItem(KEY_NAME, sessionId);
-      console.log(`新 Session ID 生成并存储: ${sessionId}`);
+      // console.log(`新 Session ID 生成并存储: ${sessionId}`);
     } else {
-      console.log(`使用现有 Session ID: ${sessionId}`);
+      // console.log(`使用现有 Session ID: ${sessionId}`);
     }
 
     return sessionId;
@@ -58,8 +59,8 @@ export default function Coze() {
       }
 
       const data = await response.json();
-      console.log(data.access_token)
-      console.log("Access Token 获取成功！");
+      // console.log(data.access_token)
+      // console.log("Access Token 获取成功！");
 
       return data.access_token;
     } catch (error) {
@@ -84,13 +85,13 @@ export default function Coze() {
     // 2. 加载外部资源
     await loadExternalResource(cozeSrc);
     const CozeWebSDK = window?.CozeWebSDK;
-    console.log(botId)
+    // console.log(botId)
     
     if (CozeWebSDK && initialToken) {
       // 3. 初始化 SDK，并传入 Token
       const cozeClient = new CozeWebSDK.WebChatClient({
         config: {
-          bot_id: '7555042015739330575'
+          bot_id: botId
         },
         componentProps: {
           title: title
