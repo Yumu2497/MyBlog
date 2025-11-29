@@ -24,6 +24,11 @@ const ClerkProvider = dynamic(() =>
   import('@clerk/nextjs').then(m => m.ClerkProvider)
 )
 
+// 动态导入全局认证模态框组件
+const GlobalAuthModal = dynamic(() => import('../components/GlobalAuthModal'), {
+  ssr: false
+})
+
 /**
  * App挂载DOM 入口文件
  * @param {*} param0
@@ -59,6 +64,7 @@ const MyApp = ({ Component, pageProps }) => {
         <Component {...pageProps} />
       </GLayout>
       <ExternalPlugins {...pageProps} />
+      <GlobalAuthModal />
     </GlobalContextProvider>
   )
   return (

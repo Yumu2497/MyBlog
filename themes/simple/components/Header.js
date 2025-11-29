@@ -3,6 +3,7 @@ import { siteConfig } from '@/lib/config'
 import SmartLink from '@/components/SmartLink'
 import CONFIG from '../config'
 import SocialButton from './SocialButton'
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 
 /**
  * 网站顶部
@@ -47,6 +48,31 @@ export default function Header(props) {
         </div>
         <div className='text-xs mt-4 text-gray-500 dark:text-gray-300'>
           {siteConfig('DESCRIPTION')}
+        </div>
+
+        {/* 用户认证按钮 */}
+        <div className='absolute top-4 right-4'>
+          <SignedOut>
+            <div className='flex space-x-2'>
+              <button
+                onClick={() => window.openAuthModal && window.openAuthModal('signin')}
+                className='px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md text-sm hover:bg-gray-300
+      dark:hover:bg-gray-600 transition-colors'
+              >
+                登录
+              </button>
+              <button
+                onClick={() => window.openAuthModal && window.openAuthModal('signup')}
+                className='px-4 py-2 bg-blue-500 dark:bg-blue-600 text-white rounded-md text-sm
+      hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors'
+              >
+                注册
+              </button>
+            </div>
+          </SignedOut>
+          <SignedIn>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
         </div>
       </div>
     </header>
